@@ -6,17 +6,17 @@ from utility import pipeline
 from mlflow.models import infer_signature
 
 # TODO: Set tht MLFlow tracking server uri
-uri = _________
+uri = "http://127.0.0.1:6001"
 # Use mlflow.set_tracking_uri to set the uri
 mlflow.set_tracking_uri(uri)
 
 # Set experiment name
-email="______@andrew.cmu.edu" # TODO: Use a customized experiment name
+email="yeheunl@andrew.cmu.edu" # TODO: Use a customized experiment name
 experiment_name=f"{email}-lab7"
 mlflow.set_experiment(experiment_name)
 
 # TODO: Generates train and test dataset using `pipeline.data_preprocessing` function
-X_train,X_test,y_train,y_test= ________
+X_train,X_test,y_train,y_test= pipeline.data_preprocessing()
 
 params = {
     "solver": "lbfgs",
@@ -26,13 +26,13 @@ params = {
 }
 
 # TODO: Use `pipeline.train_logistic_regression` to generate trained model
-trained_model=__________________
+trained_model = pipeline.train_logistic_regression(X_train=X_train, y_train=y_train, params=params)
 # TODO: use `pipeline.evaluation` to evaluate the model
-accuracy=_____________________
+accuracy= pipeline.evaluation(model=trained_model, X_test=X_test, y_test=y_test)
 
 # Log model and metrics to tracking serverhost
 # Start an MLflow run
-run_name=None # You can specify a run name or let MLFlow choose one for you.
+run_name="Run 1" # You can specify a run name or let MLFlow choose one for you.
 with mlflow.start_run(run_name=run_name):
     mlflow.log_params(params)
     mlflow.log_metric("accuracy", accuracy)
@@ -42,7 +42,7 @@ with mlflow.start_run(run_name=run_name):
     # Log the model
     model_info = mlflow.sklearn.log_model(
         sk_model=trained_model,
-        artifact_path=None, # TODO: Set the artifact path appropriately as a string
+        artifact_path="model", # TODO: Set the artifact path appropriately as a string
         signature=signature,
         input_example=X_train,
         registered_model_name=pipeline.generate_model_name(), # Optional TODO: Replace with a static name if needed
